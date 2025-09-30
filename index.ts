@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 
 app.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
-  safeLog.info("Received payload");
+  safeLog.info("Received POST payload");
 
   for (const url of webhooks) {
     try {
@@ -37,6 +37,23 @@ app.post("/webhook", async (req: Request, res: Response) => {
       status[url] = "Sent";
     } catch (err: any) {
       safeLog.error(`Failed to send to ${url}`, err.message);
+      status[url] = err.message;
+    }
+  }
+
+  res.json({ message: "dispatched", status });
+});
+
+app.get("/webhook", async (req: Request, res: Response) => {
+  safeLog.info("Received GET request");
+
+  for (const url of webhooks) {
+    try {
+      await axios.get(url, { params: req.query });
+      safeLog.log(`Reflected GET to ${url}`);
+      status[url] = "Sent";
+    } catch (err: any) {
+      safeLog.error(`Failed to reflect GET to ${url}`, err.message);
       status[url] = err.message;
     }
   }
