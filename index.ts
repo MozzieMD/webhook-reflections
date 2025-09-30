@@ -26,7 +26,7 @@ const webhooks: string[] = process.env.WEBHOOKS?.split(",") || [];
 const status: { [key: string]: string } = {};
 app.use(bodyParser.json());
 
-app.post("/telnyx", async (req: Request, res: Response) => {
+app.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
   safeLog.info("Received payload");
 
