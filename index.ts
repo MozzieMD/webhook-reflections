@@ -27,12 +27,11 @@ const status: { [key: string]: string } = {};
 app.use(bodyParser.json());
 
 app.post("/webhook", async (req: Request, res: Response) => {
-  const payload = req.body;
-  const query = req.query;
   safeLog.info("Received POST payload");
 
   for (const url of webhooks) {
     try {
+      log(req.body, req.query, req.headers);
       await axios({
         method: "post",
         url,
@@ -45,7 +44,6 @@ app.post("/webhook", async (req: Request, res: Response) => {
         },
         validateStatus: () => true,
       });
-
       safeLog.log(`Sent to ${url}`);
       status[url] = "Sent";
     } catch (err: any) {
