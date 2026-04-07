@@ -1,6 +1,5 @@
 import express, { type Request, type Response } from "express";
 import axios from "axios";
-import bodyParser from "body-parser";
 
 const { logFactory } = require("pretty-js-log");
 
@@ -24,7 +23,7 @@ const PORT = 3000;
 const webhooks: string[] = process.env.WEBHOOKS?.split(",") || [];
 
 const status: { [key: string]: string } = {};
-app.use(bodyParser.json());
+app.use(express.raw({ type: "*/*" }));
 
 app.post("/webhook", async (req: Request, res: Response) => {
   safeLog.info("Received POST payload");
