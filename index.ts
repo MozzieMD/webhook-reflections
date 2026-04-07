@@ -33,12 +33,31 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
   for (const url of webhooks) {
     try {
-      await axios.post(url, payload, { params: query });
+      await axios({
+        method: "post",
+        url,
+        data: req.body,
+        params: req.query,
+        headers: {
+          ...req.headers,
+          host: undefined,
+          "content-length": undefined,
+        },
+        validateStatus: () => true,
+      });
+
       safeLog.log(`Sent to ${url}`);
       status[url] = "Sent";
     } catch (err: any) {
-      safeLog.error(`Failed to send to ${url}`, err.message);
-      status[url] = err.message;
+      const data = err.response?.data;
+      const statusCode = err.response?.status;
+
+      safeLog.error(`Failed to send to ${url}`, {
+        status: statusCode,
+        data,
+      });
+
+      status[url] = data || err.message;
     }
   }
 
@@ -50,12 +69,29 @@ app.get("/webhook", async (req: Request, res: Response) => {
 
   for (const url of webhooks) {
     try {
-      await axios.get(url, { params: req.query });
+      await axios({
+        method: "get",
+        url,
+        params: req.query,
+        headers: {
+          ...req.headers,
+          host: undefined,
+        },
+        validateStatus: () => true,
+      });
+
       safeLog.log(`Reflected GET to ${url}`);
       status[url] = "Sent";
     } catch (err: any) {
-      safeLog.error(`Failed to reflect GET to ${url}`, err.message);
-      status[url] = err.message;
+      const data = err.response?.data;
+      const statusCode = err.response?.status;
+
+      safeLog.error(`Failed to reflect GET to ${url}`, {
+        status: statusCode,
+        data,
+      });
+
+      status[url] = data || err.message;
     }
   }
 
