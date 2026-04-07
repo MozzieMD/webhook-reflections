@@ -28,11 +28,12 @@ app.use(bodyParser.json());
 
 app.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
+  const query = req.query;
   safeLog.info("Received POST payload");
 
   for (const url of webhooks) {
     try {
-      await axios.post(url, payload);
+      await axios.post(url, payload, { params: query });
       safeLog.log(`Sent to ${url}`);
       status[url] = "Sent";
     } catch (err: any) {
