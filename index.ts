@@ -30,7 +30,6 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
   for (const url of webhooks) {
     try {
-      log(req.body, req.query, req.headers);
       await axios({
         method: "post",
         url,
